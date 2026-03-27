@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DocuClean — AI Document Cleaner</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body>
+
+    <!-- SIDE NAV -->
+    <div id="side-nav" class="side-nav">
+        <a href="#" class="close-btn" onclick="toggleNav(event)">×</a>
+        <div id="side-nav-logged-out" class="nav-section">
+            <div class="nav-logo">DocuClean</div>
+            <p class="login-msg">Login to access your history and profile.</p>
+            <button class="nav-login-btn" onclick="openLoginModal()">Login / Sign Up</button>
+        </div>
+        <div id="side-nav-logged-in" class="nav-section" style="display: none;">
+            <div class="nav-logo">DocuClean</div>
+            <div class="profile-header">
+                <div class="avatar-circle"><i class="fas fa-user"></i></div>
+                <p class="profile-name" id="user-fullname">Loading...</p>
+                <p class="profile-sub" id="user-email">Loading...</p>
+            </div>
+            <a href="#" class="nav-link"><i class="fas fa-images"></i> My History</a>
+            <a href="#" class="nav-link logout-link" id="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main-content">
+        <header>
+            <div class="header-left">
+                <i class="fas fa-bars menu-icon" onclick="toggleNav(event)"></i>
+                <span class="brand">DocuClean</span>
+            </div>
+            <div class="header-right">
+                <button id="header-login-btn" class="login-signup-btn" onclick="openLoginModal()">Login / Sign
+                    Up</button>
+            </div>
+        </header>
+
+        <main>
+            <!-- HERO -->
+            <section class="hero">
+                <h1>Clean your documents<br><span class="accent">with AI precision.</span></h1>
+                <p class="hero-sub">Upload a scanned document, paint over the stains, and let AI restore it instantly.
+                </p>
+            </section>
+
+            <!-- SAMPLE COMPARISON -->
+            <div class="image-comparison-area">
+                <div class="image-box">
+                    <div class="image-placeholder">
+                        <i class="fas fa-file-image fa-2x"></i>
+                        <span>Before</span>
+                    </div>
+                    <p class="caption">BEFORE PROCESSING</p>
+                </div>
+                <div class="arrow-divider"><i class="fas fa-arrow-right"></i></div>
+                <div class="image-box">
+                    <div class="image-placeholder clean">
+                        <i class="fas fa-magic fa-2x"></i>
+                        <span>After</span>
+                    </div>
+                    <p class="caption">AFTER PROCESSING</p>
+                </div>
+            </div>
+
+            <!-- CONTROLS -->
+            <div class="controls-container">
+
+                <!-- Upload Zone -->
+                <div class="upload-zone" id="upload-zone" onclick="document.getElementById('image-upload').click()">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <p>Click or drag an image to upload</p>
+                    <span class="upload-hint">JPG, PNG — Max 10MB</span>
+                    <input type="file" id="image-upload" accept="image/jpeg,image/png" style="display:none">
+                </div>
+
+                <!-- Instructions (shown after upload) -->
+                <div class="instructions" id="instructions" style="display:none">
+                    <i class="fas fa-paint-brush"></i>
+                    <span>Paint over stains or marks you want removed, then hit <strong>Process Now</strong>.</span>
+                </div>
+
+                <!-- Brush size slider (shown after upload) -->
+                <div class="brush-controls" id="brush-controls" style="display:none">
+                    <label for="brush-size"><i class="fas fa-circle" style="font-size:8px"></i> Brush Size</label>
+                    <input type="range" id="brush-size" min="5" max="80" value="25">
+                    <button id="clear-mask-btn" onclick="clearMask()"><i class="fas fa-undo"></i> Clear</button>
+                </div>
+
+                <!-- Canvas Editor -->
+                <div id="editor-area">
+                    <canvas id="imageCanvas"></canvas>
+                    <canvas id="maskCanvas"></canvas>
+                </div>
+
+                <!-- Process Button -->
+                <button id="process-btn" class="process-btn" style="display:none">
+                    <i class="fas fa-wand-magic-sparkles"></i> Process Now
+                </button>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- LOGIN MODAL -->
+    <div id="login-modal" class="modal-overlay" style="display:none" onclick="closeModalOnOverlay(event)">
+        <div class="modal-box">
+            <button class="modal-close" onclick="closeLoginModal()">×</button>
+            <h2 class="modal-title">Welcome Back</h2>
+            <p class="modal-sub">Sign in or create an account</p>
+            <div class="modal-tabs">
+                <button class="tab-btn active" onclick="switchTab('login', this)">Login</button>
+                <button class="tab-btn" onclick="switchTab('signup', this)">Sign Up</button>
+            </div>
+            <div id="tab-login" class="tab-content">
+                <input type="email" id="login-email" placeholder="Email address" class="modal-input">
+                <input type="password" id="login-password" placeholder="Password" class="modal-input">
+                <p id="login-error" class="modal-error" style="display:none"></p>
+                <button class="modal-submit-btn" onclick="submitLogin()">Login</button>
+                <div class="modal-divider"><span>or</span></div>
+                <a href="http://127.0.0.1:5000/auth/google" class="btn-google">
+                    <svg width="18" height="18" viewBox="0 0 48 48">
+                        <path fill="#EA4335"
+                            d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z" />
+                        <path fill="#4285F4"
+                            d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z" />
+                        <path fill="#FBBC05"
+                            d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z" />
+                        <path fill="#34A853"
+                            d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z" />
+                    </svg>
+                    Continue with Google
+                </a>
+            </div>
+            <div id="tab-signup" class="tab-content" style="display:none">
+                <input type="text" id="signup-name" placeholder="Full name" class="modal-input">
+                <input type="email" id="signup-email" placeholder="Email address" class="modal-input">
+                <input type="password" id="signup-password" placeholder="Password (min 6 chars)" class="modal-input">
+                <p id="signup-error" class="modal-error" style="display:none"></p>
+                <button class="modal-submit-btn" onclick="submitRegister()">Create Account</button>
+                <div class="modal-divider"><span>or</span></div>
+                <a href="http://127.0.0.1:5000/auth/google" class="btn-google">
+                    <svg width="18" height="18" viewBox="0 0 48 48">
+                        <path fill="#EA4335"
+                            d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z" />
+                        <path fill="#4285F4"
+                            d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z" />
+                        <path fill="#FBBC05"
+                            d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z" />
+                        <path fill="#34A853"
+                            d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z" />
+                    </svg>
+                    Continue with Google
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

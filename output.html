@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DocuClean — Result</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .result-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 24px 80px;
+            gap: 28px;
+        }
+
+        .result-title {
+            font-family: var(--font-display);
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--text);
+            text-align: center;
+        }
+
+        .result-title span {
+            color: var(--accent);
+        }
+
+        .result-image-wrap {
+            max-width: 640px;
+            width: 100%;
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            border: 1.5px solid var(--border);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        .result-image-wrap img {
+            display: block;
+            width: 100%;
+            height: auto;
+        }
+
+        .result-actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .btn-download {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--accent);
+            color: var(--primary);
+            border: none;
+            padding: 14px 36px;
+            border-radius: 50px;
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            text-decoration: none;
+            box-shadow: 0 0 30px var(--accent-glow);
+            transition: opacity 0.2s, transform 0.2s;
+        }
+
+        .btn-download:hover {
+            opacity: 0.85;
+            transform: translateY(-2px);
+        }
+
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--surface);
+            color: var(--text);
+            border: 1px solid var(--border);
+            padding: 14px 36px;
+            border-radius: 50px;
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            text-decoration: none;
+            transition: border-color 0.2s;
+        }
+
+        .btn-back:hover {
+            border-color: var(--text-muted);
+        }
+
+        .btn-reedit {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: transparent;
+            color: var(--accent-2);
+            border: 1px solid var(--accent-2);
+            padding: 14px 36px;
+            border-radius: 50px;
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background-color 0.2s, opacity 0.2s, transform 0.2s;
+        }
+
+        .btn-reedit:hover {
+            background-color: rgba(129, 140, 248, 0.12);
+            transform: translateY(-2px);
+        }
+
+        .reedit-hint {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-align: center;
+            margin-top: -8px;
+        }
+
+        .no-result {
+            color: var(--text-muted);
+            font-size: 1rem;
+            text-align: center;
+            padding: 60px 24px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="main-content">
+        <header>
+            <div class="header-left">
+                <a href="index.html" style="text-decoration:none">
+                    <span class="brand">DocuClean</span>
+                </a>
+            </div>
+        </header>
+        <div class="result-container" id="result-container">
+            <!-- populated by JS -->
+        </div>
+    </div>
+    <script>
+        const container = document.getElementById("result-container");
+        const url = localStorage.getItem("resultUrl");
+
+        if (url) {
+            container.innerHTML = `
+                <h2 class="result-title">Your document is <span>clean</span> ✨</h2>
+                <div class="result-image-wrap">
+                    <img src="${url}" alt="Cleaned document" />
+                </div>
+                <div class="result-actions">
+                    <a href="${url}" download="cleaned-document.png" class="btn-download">
+                        <i class="fas fa-download"></i> Download
+                    </a>
+                    <button class="btn-reedit" onclick="reEditImage()">
+                        <i class="fas fa-paint-brush"></i> Re-edit This Image
+                    </button>
+                    <a href="index.html" class="btn-back">
+                        <i class="fas fa-arrow-left"></i> Clean Another
+                    </a>
+                </div>
+                <p class="reedit-hint">Not fully clean? Paint over remaining stains and process again.</p>
+            `;
+            // Keep resultUrl — we only remove it when user clicks "Clean Another"
+            // or when re-edit is triggered (handled in reEditImage)
+        } else {
+            container.innerHTML = `
+                <p class="no-result">No result found. <a href="index.html" style="color:var(--accent)">Go back</a> and process an image first.</p>
+            `;
+        }
+
+        function reEditImage() {
+            // Pass the cleaned image URL b
+            // ack to index.html to load into the editor
+            localStorage.setItem("reEditUrl", url);
+            localStorage.removeItem("resultUrl");
+            window.location.href = "index.html";
+        }
+    </script>
+</body>
+
+</html>
